@@ -120,6 +120,7 @@ export default class CustomTable extends Component {
           <Table.Column title="奖品标题" dataIndex="productName" />
           <Table.Column title="物品名称" dataIndex="goodsTitle" />
           <Table.Column title="物品图片" dataIndex="goodsPic" cell={renderGoodsPic} />
+          <Table.Column title="物品库存" dataIndex="goodsTotal" />
           <Table.Column title="领取过期时间" dataIndex="expireTime" />
           <Table.Column title="出现概率" dataIndex="showRate" cell={renderShowRate} />
           <Table.Column title="领取地址" dataIndex="targetUrl" />

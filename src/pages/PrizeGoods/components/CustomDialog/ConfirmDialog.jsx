@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Dialog, Button, Form, Input, Field, Message } from '@alifd/next';
-import { del } from '../../../../api/products';
+import { del } from '../../../../api/goods';
 
 
 export default class ConfirmDialog extends Component {

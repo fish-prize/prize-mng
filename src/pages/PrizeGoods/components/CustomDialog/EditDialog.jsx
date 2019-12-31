@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Dialog, Button, Form, Input, Field, Message, NumberPicker, Upload, Radio } from '@alifd/next';
+import {Grid, Dialog, Button, Form, Input, Field, Message, NumberPicker, Upload, Radio, DatePicker} from '@alifd/next';
 import Img from '@icedesign/img';
 import Select from '@alifd/next/lib/select';
 import { update } from '../../../../api/goods';
@@ -25,14 +25,14 @@ export default class EditDialog extends Component {
     this.field = new Field(this);
   }
 
-  handlePrizeActivitySelectChange = item => {
-    console.log('handlePrizeActivitySelectChange: ', item);
+  handlePrizeProductSelectChange = item => {
+    console.log('handlePrizeProductSelectChange: ', item);
     if (!item) return;
-    this.field.setValues({ prizeId: item.value, prizeTitle: item.label });
+    this.field.setValues({ productId: item.value, productName: item.label });
     this.setState({
       visible: true,
-      prizeId: item.value,
-      prizeTitle: item.label,
+      productId: item.value,
+      productName: item.label,
     });
   };
 
@@ -52,7 +52,7 @@ export default class EditDialog extends Component {
         return;
       }
 
-      if (!values.productIcon) {
+      if (!values.goodsPic) {
         Message.error('请上传奖品ICON');
         return;
       }
@@ -77,18 +77,18 @@ export default class EditDialog extends Component {
   };
   onUploadSuccess = (file, value) => {
     const imgUrl = value[0].response.data.url;
-    this.field.setValues({ productIcon: imgUrl });
+    this.field.setValues({ goodsPic: imgUrl });
   };
   onUploadRemove = () => {
-    this.field.setValues({ productIcon: '' });
+    this.field.setValues({ goodsPic: '' });
   };
   onOpen = (index, record) => {
     const copyRecord = Object.assign({}, record);
     this.field.setValues({ ...copyRecord });
     this.setState({
       visible: true,
-      prizeId: record.prizeId,
-      prizeTitle: record.prizeTitle,
+      productId: record.productId,
+      productName: record.productName,
     });
   };
 
@@ -125,32 +125,31 @@ export default class EditDialog extends Component {
           title="编辑"
         >
           <Form field={this.field}>
-            <FormItem label="奖品ID：" {...formItemLayout}>
-              <Input readOnly
-                {...init('id', {
-                       rules: [{ required: true, disabled: true }],
-                     })}
-              />
-            </FormItem>
-            <FormItem label="奖品名称：" {...formItemLayout}>
-              <Input
-                {...init('productName', {
-                       rules: [{ required: true, disabled: true, message: '请输入奖品名称' }],
-                     })}
-              />
-            </FormItem>
-            <FormItem label="抽奖活动：" {...formItemLayout}>
+            <FormItem label="奖品：" required {...formItemLayout}>
               <Select
                 style={{ width: '100%' }}
                 showSearch
                 useDetailValue
                 filterLocal={false}
-                dataSource={this.props.prizeActivityDataSource1}
-                onChange={this.handlePrizeActivitySelectChange}
-                value={{ value: this.state.prizeId, label: this.state.prizeTitle }}
+                dataSource={this.props.prizeProductsDataSource1}
+                onChange={this.handlePrizeProductSelectChange}
+                value={{ value: this.state.productId, label: this.state.productName }}
               />
             </FormItem>
-            <FormItem label="奖品ICON：" {...formItemLayout}>
+            <FormItem label="物品名称：" {...formItemLayout}>
+              <Input
+                placeholder="请输入物品名称"
+                {...init('goodsTitle', {
+                  rules: [{ required: true, message: '请输入物品名称' }],
+                })}
+              />
+            </FormItem>
+
+            <FormItem label="库存：" {...formItemLayout}>
+              <NumberPicker style={{ width: 120 }} min={0} max={9999999} precision={0} name="goodsTotal" defaultValue={9999999} />
+            </FormItem>
+
+            <FormItem label="物品图片(建议300*300)：" {...formItemLayout}>
               <Upload.Card
                 autoUpload
                 dragable
@@ -159,102 +158,36 @@ export default class EditDialog extends Component {
                 timeout={10000}
                 action={`${baseUrl}/file/upload`}
                 accept="image/png, image/jpg, image/jpeg, image/gif, image/bmp"
+                onSuccess={this.onUploadSuccess}
+                onRemove={this.onUploadRemove}
                 defaultValue={[
                   {
                     uid: record.id,
-                    url: record.productIcon,
-                    imgURL: record.productIcon,
+                    url: record.goodsPic,
+                    imgURL: record.goodsPic,
                   },
                 ]}
-                onSuccess={this.onUploadSuccess}
-                onRemove={this.onUploadRemove}
               />
             </FormItem>
-            <FormItem label="库存：" {...formItemLayout}>
-              <NumberPicker style={{ width: 120 }} min={0} max={9999999} precision={0} name="productTotal" defaultValue={9999999} />
+            <FormItem label="出现概率：" {...formItemLayout}>
+              <NumberPicker style={{ width: 120 }} min={0} max={100} precision={0} name="showRate" defaultValue={100} label="百分之:" />
             </FormItem>
-
-            <FormItem label="中奖概率：" {...formItemLayout}>
-              <NumberPicker style={{ width: 120 }} min={0} max={100} precision={0} name="hitRate" defaultValue={100} label="百分之:" />
+            <FormItem label="领取过期时间：" {...formItemLayout}>
+              <DatePicker
+                format="YYYY-MM-DD"
+                showTime={{ format: 'HH:mm:ss' }}
+                {...init('expireTime', {
+                  rules: [{ required: true, disabled: true, message: '前选择领取过期时间' }],
+                })}
+              />
             </FormItem>
-
-            <FormItem label="中奖背景：" {...formItemLayout}>
-              <Radio.Group name="winBgImgUrl" >
-                <Row>
-                  <Col span="8" align="center">
-                    <Radio value="http://img.ichenxing.cn/prize/win_bg_3.gif">
-                      通用奖背景
-                    </Radio>
-                  </Col>
-                  <Col span="8">
-                    <Radio value="http://img.ichenxing.cn/prize/win_bg_0.gif">
-                      特等奖背景
-                    </Radio>
-                  </Col>
-                  <Col span="8">
-                    <Radio value="http://img.ichenxing.cn/prize/win_bg_1.gif">
-                      一等奖背景
-                    </Radio>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span="8" align="center">
-                    <Img
-                      src="http://img.ichenxing.cn/prize/win_bg_3.gif"
-                      width={100}
-                      height={110}
-                      title="通用奖背景"
-                    />
-                  </Col>
-                  <Col span="8">
-                    <Img
-                      src="http://img.ichenxing.cn/prize/win_bg_0.gif"
-                      width={100}
-                      height={110}
-                      title="特等奖背景"
-                    />
-                  </Col>
-                  <Col span="8">
-                    <Img
-                      src="http://img.ichenxing.cn/prize/win_bg_1.gif"
-                      width={100}
-                      height={110}
-                      title="一等奖背景"
-                    />
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col span="8" align="center">
-                    <Radio value="http://img.ichenxing.cn/prize/win_bg_2.gif">
-                      二奖背景
-                    </Radio>
-                  </Col>
-                  <Col span="8">
-                    <Radio value="http://img.ichenxing.cn/prize/win_bg_3.gif">
-                      三奖背景
-                    </Radio>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span="8" align="center">
-                    <Img
-                      src="http://img.ichenxing.cn/prize/win_bg_2.gif"
-                      width={100}
-                      height={110}
-                      title="二等奖背景"
-                    />
-                  </Col>
-                  <Col span="8">
-                    <Img
-                      src="http://img.ichenxing.cn/prize/win_bg_3.gif"
-                      width={100}
-                      height={110}
-                      title="三等奖背景"
-                    />
-                  </Col>
-                </Row>
-              </Radio.Group>
+            <FormItem label="领取地址：" {...formItemLayout}>
+              <Input
+                placeholder="请输入领取地址"
+                {...init('targetUrl', {
+                  rules: [{ required: true, message: '请输入领取地址' }],
+                })}
+              />
             </FormItem>
           </Form>
         </Dialog>

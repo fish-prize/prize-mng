@@ -3,7 +3,7 @@ import { Message } from '@alifd/next';
 // import { MemoryRouter } from 'react-router';
 
 const baseUrl = 'http://localhost:8081/';
-
+// const baseUrl = 'http://prize.ichenxing.cn/';
 axios.defaults.baseURL = baseUrl;
 axios.defaults.withCredentials = true;
 axios.defaults.timeout = 100000;

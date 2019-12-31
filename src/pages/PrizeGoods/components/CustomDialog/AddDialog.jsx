@@ -164,6 +164,11 @@ export default class AddDialog extends Component {
                 })}
               />
             </FormItem>
+
+            <FormItem label="库存：" {...formItemLayout}>
+              <NumberPicker style={{ width: 120 }} min={0} max={9999999} precision={0} name="goodsTotal" defaultValue={9999999} />
+            </FormItem>
+
             <FormItem label="物品图片(建议300*300)：" {...formItemLayout}>
               <Upload.Card
                 autoUpload
