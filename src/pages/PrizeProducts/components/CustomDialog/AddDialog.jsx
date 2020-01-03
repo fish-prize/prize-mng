@@ -196,7 +196,7 @@ export default class AddDialog extends Component {
                 <Row>
                   <Col span="8" align="center">
                     <Img
-                      src="http://img.ichenxing.cn/prize/win_bg_3.gif"
+                      src="http://img.ichenxing.cn/prize/win_bg_ty.gif"
                       width={100}
                       height={110}
                       title="通用奖背景"

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Table, Pagination, Message } from '@alifd/next';
+import { Button, Table, Pagination, Balloon } from '@alifd/next';
 import PropTypes from 'prop-types';
 
 import EditDialog from '../CustomDialog/EditDialog';
@@ -109,6 +109,26 @@ export default class CustomTable extends Component {
       );
     };
 
+    const renderRules = (value, index, record) => {
+      const content = (<div style={styles.htmlContent} dangerouslySetInnerHTML={{ __html: record.rules }} />);
+      const MoveTarget = <Button style={{ margin: '5px' }}>查看</Button>;
+      return (
+        <Balloon style={{ width: 320 }} align="l" trigger={MoveTarget} triggerType="hover">
+          {content}
+        </Balloon>
+      );
+    };
+
+    const renderInvalideContent = (value, index, record) => {
+      const content = (<div style={styles.htmlContent} dangerouslySetInnerHTML={{ __html: record.invalidContent }} />);
+      const MoveTarget = <Button style={{ margin: '5px' }}>查看</Button>;
+      return (
+        <Balloon style={{ width: 320 }} align="l" trigger={MoveTarget} triggerType="hover">
+          {content}
+        </Balloon>
+      );
+    };
+
     return (
       <div style={style}>
         <Table
@@ -123,8 +143,8 @@ export default class CustomTable extends Component {
           <Table.Column title="秘钥" dataIndex="appKey" />
           <Table.Column title="客服电话" dataIndex="servicePhone" />
           <Table.Column title="状态" dataIndex="status" cell={renderStatus} />
-          <Table.Column title="活动规则" dataIndex="rules" />
-          <Table.Column title="无效时推荐内容" dataIndex="invalidContent" />
+          <Table.Column title="活动规则" dataIndex="rules" cell={renderRules} />
+          <Table.Column title="无效时推荐内容" dataIndex="invalidContent" cell={renderInvalideContent} />
           <Table.Column title="创建时间" dataIndex="createTime" />
           <Table.Column title="更新时间" dataIndex="updateTime" />
           <Table.Column title="操作" dataIndex="authed" cell={renderOperation} />
@@ -175,5 +195,11 @@ const styles = {
   },
   cover: {
     height: '60px',
+  },
+  htmlContent: {
+    width: '280px',
+    maxHeight: '400px',
+    overflowX: 'hidden',
+    overflowY: 'scroll',
   },
 };
